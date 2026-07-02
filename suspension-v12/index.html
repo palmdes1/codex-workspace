@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RC Rear Suspension</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #0b1219;
+      color: #9bb1c2;
+      font: 14px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .loading {
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      text-align: center;
+    }
+    strong {
+      color: #e8c547;
+      display: block;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .error {
+      color: #ff6b6b;
+      max-width: 640px;
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading">
+    <div>
+      <strong>RC Rear Suspension</strong>
+      Loading simulator...
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+  <script>
+    async function boot() {
+      const response = await fetch("./payload.b64", { cache: "no-store" });
+      if (!response.ok) throw new Error("Could not load simulator payload.");
+      const b64 = (await response.text()).replace(/\s+/g, "");
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const html = pako.ungzip(bytes, { to: "string" });
+      document.open();
+      document.write(html);
+      document.close();
+    }
+    boot().catch((error) => {
+      document.body.innerHTML = '<div class="loading"><div class="error"><strong>Could not load simulator</strong>' + error.message + '</div></div>';
+    });
+  </script>
+</body>
+</html>
